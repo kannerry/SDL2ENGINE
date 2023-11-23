@@ -3,6 +3,7 @@
 #ifndef MAIN_HELPER_H
 
 #define MAIN_HELPER_H
+#include <iostream>
 
 template<typename T>
 struct Vector2T {
@@ -19,6 +20,5 @@ struct Vector2T {
     }
 
 };
-
 
 #endif // !MAIN_HELPER_H
