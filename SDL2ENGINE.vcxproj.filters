@@ -23,5 +23,8 @@
     <ClInclude Include="sdl_helper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="main_helper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

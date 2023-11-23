@@ -1,9 +1,9 @@
 #pragma once
 #pragma warning (disable:4244)
 
-#ifndef SDL_HJALP_H
+#ifndef SDL_HELP_H
 
-#define SDL_HJALP_H
+#define SDL_HELP_H
 #include "SDL2/SDL.h"
 
 struct WindowContainer {
@@ -50,4 +50,4 @@ void sdl_default_render_present(WindowContainer* wc) {
     SDL_RenderPresent(wc->renderer);
 }
 
-#endif // SDL_HJALP_H
+#endif // SDL_HELP_H
