@@ -131,8 +131,8 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="main_helper.h" />
-    <ClInclude Include="sdl_helper.h" />
+    <ClInclude Include="helper_main.h" />
+    <ClInclude Include="helper_sdl.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

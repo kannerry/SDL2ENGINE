@@ -20,10 +20,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="sdl_helper.h">
+    <ClInclude Include="helper_sdl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="main_helper.h">
+    <ClInclude Include="helper_main.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
