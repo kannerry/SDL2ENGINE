@@ -4,6 +4,8 @@
 #include "helper_sdl.h"
 #include "helper_main.h"
 
+#include <string>
+
 Vector3T<Uint8> get_rgb_from_time(Uint64 current_time) {
 	float frequency = 0.001f;
 	Uint8 red = (Uint8)(sin(frequency * current_time + 0) * 127 + 128);
@@ -28,7 +30,18 @@ void render(WindowContainer* window_container) {
 	SpriteSheetFont ssf{};
 	Vector3T<Uint8> col = get_rgb_from_time(SDL_GetTicks64());
 	ssf.font_color = col;
-	sdl_draw_text("Powder Game", Vector2T<int>(5, 5), window_container->renderer, ssf);
+	sdl_draw_text("POWDER GAME", Vector2T<int>(5, 5), window_container->renderer, ssf);
+	
+	RenderTextureParameters cursor{
+		"assets/cursor.png",
+		mouse_position
+	};
+	cursor.modulate = col;
+
+	sdl_render_texture(cursor, window_container->renderer);
+
+	std::string rp = "(" + std::to_string(mouse_position.x) + ", " + std::to_string(mouse_position.y) + ")";
+	sdl_draw_text(rp.c_str(), mouse_position + Vector2T<int>(15, 15), window_container->renderer, ssf);
 	//
 
 	sdl_default_render_present(window_container); // present
@@ -37,6 +50,7 @@ void render(WindowContainer* window_container) {
 int main(int argc, char* args[]) { // main func. gets called when opening the exe
 	WindowContainer window_container{};
 	sdl_init("POWDER GAME", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 450, &window_container, 2);
+	SDL_ShowCursor(false);
 	SDL_Event event;
 	while (window_container.alive) {
 		render(&window_container);

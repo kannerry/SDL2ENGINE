@@ -88,7 +88,7 @@ SDL_Texture* create_texture_from_surface(SDL_Renderer* renderer, SDL_Surface* su
     return tex;
 }
 
-void sdl_rendertexcropped(RenderTextureParameters param, SDL_Renderer* renderer) {
+void __sdl_rtc(RenderTextureParameters param, SDL_Renderer* renderer) {
     SDL_Surface* surface = load_image_to_surface(param.path_to_image);
     SDL_Texture* texture = create_texture_from_surface(renderer, surface);
     // x.xy = xy // y.xy = wh
@@ -99,7 +99,7 @@ void sdl_rendertexcropped(RenderTextureParameters param, SDL_Renderer* renderer)
     SDL_DestroyTexture(texture);
 }
 
-void _sdl_rendertexdefault(RenderTextureParameters param, SDL_Renderer* renderer) {
+void __sdl_rt(RenderTextureParameters param, SDL_Renderer* renderer) {
     SDL_Surface* surface = load_image_to_surface(param.path_to_image);
     SDL_Texture* texture = create_texture_from_surface(renderer, surface);
     SDL_Rect texture_rect = { param.position.x, param.position.y, 0, 0 };
@@ -113,10 +113,10 @@ void _sdl_rendertexdefault(RenderTextureParameters param, SDL_Renderer* renderer
 void sdl_render_texture(RenderTextureParameters param, SDL_Renderer* renderer) {
     if (param.crop_rect == Vector2T<Vector2T<int>>{ {0, 0}, { 0, 0 } }) // x.y , w.h
     {
-        _sdl_rendertexdefault(param, renderer);
+        __sdl_rt(param, renderer);
     }
     else {
-        sdl_rendertexcropped(param, renderer);
+        __sdl_rtc(param, renderer);
     }
 }
 
@@ -127,24 +127,40 @@ void sdl_draw_text(const char* text, Vector2T<int> pos, SDL_Renderer* r, SpriteS
     };
     font_param.modulate = fontsheet.font_color;
     int i = 0;
+    int pathx = fontsheet.character_size.x;
+    int pathy = fontsheet.character_size.y;
     for (; *text != '\0'; ++text) {
         char ch = *text;
         int offset_UC = ch - 'A';
         int offset_LC = ch - 'a';
+        int offset_NUM = ch - '0';
+        int offset_SYM = ch - '!';
         if (offset_UC >= 0 && offset_UC < 25) {
             font_param.crop_rect = { {0, 0}, fontsheet.character_size };
-            font_param.position.x += 8;
-            font_param.crop_rect.x.x = offset_UC * 8;
+            font_param.position.x += pathx;
+            font_param.crop_rect.x.x = (offset_UC * 8);
         }
-        if (offset_LC >= 0 && offset_LC < 25) {
+        else if (offset_LC >= 0 && offset_LC < 25) {
             font_param.crop_rect = { {0, 0}, fontsheet.character_size };
-            font_param.position.x += 8;
+            font_param.position.x += pathx;
             font_param.crop_rect.x.x = (offset_LC * 8) + 26*8;
         }
-        if (ch == ' ') {
+        else if (ch == ' ') {
             font_param.position.x += 8;
         }
-        std::cout << offset_LC << "\n";
+        else if (offset_NUM >= 0 && offset_NUM <= 9){
+            std::cout << ch << "\n";
+            font_param.crop_rect = { {0, 0}, fontsheet.character_size };
+            font_param.position.x += pathx;
+            font_param.crop_rect.x.x = (offset_NUM * 8);
+            font_param.crop_rect.x.y = pathy * 1;
+        }
+        else if (offset_SYM >= 0 && offset_SYM <= 14) {
+            font_param.crop_rect = { {0, 0}, fontsheet.character_size };
+            font_param.position.x += pathx;
+            font_param.crop_rect.x.x = (offset_SYM * 8) + 10*8;
+            font_param.crop_rect.x.y = pathy * 1;
+        }
         if (ch != ' ') {
             sdl_render_texture(font_param, r);
         }
