@@ -14,7 +14,7 @@
 // the screen, that's something that would be interesting to implement. feel free
 // to try and do it!
 
-const int default_player_length = 4;
+const int default_player_length = 5;
 const int default_base_fps_cap = 12;
 
 void render_snake_chunk(int x, int y, SDL_Renderer* r) {
@@ -149,14 +149,15 @@ void process_game(SnakeGameState *gs, WindowContainer *wc) {
 	{
 		gs->player_body.pop_back();
 	}
-	if (chunk_is_at(position_infront, gs) || !is_within_bounds(position_infront, 0, 47, 0, 25))
+	if (chunk_is_at(position_infront, gs) || !is_within_bounds(position_infront, 0, 47, 0, 26))
 	{
 		int precheck = gs->player_length - 3;
 		if (precheck < 0) {
 			gs->player_length = 0;
 		}
 		else {
-			gs->player_length -= 3;
+			gs->player_length -= 1;
+			gs->player_body.pop_back();
 		}
 		return;
 	}
