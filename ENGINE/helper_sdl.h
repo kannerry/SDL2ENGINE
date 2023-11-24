@@ -42,10 +42,10 @@ void sdl_cleanup(WindowContainer* wc) { // destroy stuff and deinit sdl
 
 // for scaling purposes: the mouse pos within the window doesn't match up to the renderer when
 // SDL_RenderSetLogicalSize() gets called
-void SDL_GetLogicalMouseState(int* rX, int* rY, SDL_Renderer* r, SDL_Window* w) {
+void SDL_GetLogicalMouseState(int* rX, int* rY, WindowContainer* wc) {
     Vector2T<int> logical_size; Vector2T<int> window_size; Vector2T<int> mouse_position;
-    SDL_RenderGetLogicalSize(r, &logical_size.x, &logical_size.y);
-    SDL_GetWindowSize(w, &window_size.x, &window_size.y);
+    SDL_RenderGetLogicalSize(wc->renderer, &logical_size.x, &logical_size.y);
+    SDL_GetWindowSize(wc->window, &window_size.x, &window_size.y);
     SDL_GetMouseState(&mouse_position.x, &mouse_position.y);
     int x1 = (mouse_position.x * logical_size.x); int x2 = window_size.x;
     int y1 = (mouse_position.y * logical_size.y); int y2 = window_size.y;
