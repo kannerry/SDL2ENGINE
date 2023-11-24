@@ -44,7 +44,6 @@ void sdl_default_{process_event}/{render_clear}/{render_present}() {
 
 ## TODO:
 ```
-> Text rendering
 > More types within 'helper_main.h'
 ? Default UI (buttons? input boxes?)
 ? Particle system

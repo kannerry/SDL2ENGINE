@@ -23,11 +23,12 @@ void render(WindowContainer* window_container) {
 	Vector2T<int> mouse_position;
 	SDL_GetLogicalMouseState(&mouse_position.x, &mouse_position.y, window_container);
 
+	//
+	// TL-name
 	SpriteSheetFont ssf{};
 	Vector3T<Uint8> col = get_rgb_from_time(SDL_GetTicks64());
 	ssf.font_color = col;
-	sdl_draw_text("a", mouse_position + Vector2T<int>(0, -10), window_container->renderer, ssf);
-
+	sdl_draw_text("Powder Game", Vector2T<int>(5, 5), window_container->renderer, ssf);
 	//
 
 	sdl_default_render_present(window_container); // present

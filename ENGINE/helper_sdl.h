@@ -123,10 +123,33 @@ void sdl_render_texture(RenderTextureParameters param, SDL_Renderer* renderer) {
 void sdl_draw_text(const char* text, Vector2T<int> pos, SDL_Renderer* r, SpriteSheetFont fontsheet = {}) {
     RenderTextureParameters font_param{
         fontsheet.path_to_sheet,
-        pos
+        pos - Vector2T<int>(8, 0)
     };
     font_param.modulate = fontsheet.font_color;
-    sdl_render_texture(font_param, r);
+    int i = 0;
+    for (; *text != '\0'; ++text) {
+        char ch = *text;
+        int offset_UC = ch - 'A';
+        int offset_LC = ch - 'a';
+        if (offset_UC >= 0 && offset_UC < 25) {
+            font_param.crop_rect = { {0, 0}, fontsheet.character_size };
+            font_param.position.x += 8;
+            font_param.crop_rect.x.x = offset_UC * 8;
+        }
+        if (offset_LC >= 0 && offset_LC < 25) {
+            font_param.crop_rect = { {0, 0}, fontsheet.character_size };
+            font_param.position.x += 8;
+            font_param.crop_rect.x.x = (offset_LC * 8) + 26*8;
+        }
+        if (ch == ' ') {
+            font_param.position.x += 8;
+        }
+        std::cout << offset_LC << "\n";
+        if (ch != ' ') {
+            sdl_render_texture(font_param, r);
+        }
+        ++i;
+    }
 }
 
 // defaults
