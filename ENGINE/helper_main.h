@@ -26,4 +26,25 @@ struct Vector2T { // dynamically typed vector2, can be float, can be int, etc...
 
 };
 
+template<typename T>
+struct Vector3T {
+    T x, y, z;
+
+    Vector3T() : x(T()), y(T()), z(T()) {}
+    Vector3T(const T& _x, const T& _y, const T& _z) : x(_x), y(_y), z(_z) {}
+
+    Vector3T<T> operator+(const Vector3T<T>& other) const {
+        return Vector3T<T>(x + other.x, y + other.y, z + other.z);
+    }
+
+    Vector3T<T> operator-(const Vector3T<T>& other) const {
+        return Vector3T<T>(x - other.x, y - other.y, z - other.z);
+    }
+
+    bool operator==(const Vector3T<T>& other) const {
+        return x == other.x && y == other.y && z == other.z;
+    }
+};
+
+
 #endif // !MAIN_HELPER_H

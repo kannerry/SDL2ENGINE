@@ -14,6 +14,22 @@ struct WindowContainer { // contains a window, renderer, and the state of said w
     bool alive = true;
 };
 
+struct RenderTextureParameters {
+    const char* path_to_image;
+    Vector2T<int> position;
+    double angle = 0;
+    SDL_RendererFlip flipflags = SDL_FLIP_NONE;
+    SDL_Point* pivot = NULL;
+    Vector3T<Uint8> modulate = { 0, 0, 0 };
+    Vector2T<Vector2T<int>> crop_rect{ {0, 0}, {0, 0} };
+};
+
+struct SpriteSheetFont {
+    Vector2T<int> character_size{8, 8}; // size of each character in pixels, width & height
+    const char* path_to_sheet = "assets/defaultfont.png";
+    Vector3T<Uint8> font_color{ 255, 0, 0 };
+};
+
 // instantiate all the stuff needed for SDL rendering + some scaling if needed 
 // *don't want a 30x30 window, but still want 30x30 pixels to render? try 300x300 (30x30 at 10x scale)*
 int sdl_init(const char* title, int xpos, int ypos, int width, int height, WindowContainer* wc, int scale = 1) {
@@ -53,25 +69,64 @@ void SDL_GetLogicalMouseState(int* rX, int* rY, WindowContainer* wc) {
     *rY = (mouse_position.y * logical_size.y) / window_size.y;
 }
 
-// draw a texture at x, y
-int sdl_render_texture(const char* path_to_image, int x, int y, SDL_Renderer* r, double angle = 0, SDL_Point* pivot = NULL, SDL_RendererFlip flipflags = SDL_FLIP_NONE) {
+SDL_Surface* load_image_to_surface(const char* path_to_image) {
     SDL_Surface* surface = IMG_Load(path_to_image);
     if (!surface) {
-        std::cerr << "!surface:sdl_render_texture @ " << path_to_image << " (" << x << ", " << y << ")\n";
-        return EXIT_FAILURE;
+        std::cerr << "!surface:sdl_render_texture @ " << path_to_image << "\n";
+        return NULL;
     }
-    SDL_Texture* texture = SDL_CreateTextureFromSurface(r, surface);
+    return surface;
+}
+
+SDL_Texture* create_texture_from_surface(SDL_Renderer* renderer, SDL_Surface* surface) {
+    SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_FreeSurface(surface);
-    if (!texture) {
+    if (!tex) {
         std::cerr << "!texture:sdl_render_texture()\n";
-        return EXIT_FAILURE;
+        return NULL;
     }
-    Vector2T<int> texture_size;
-    SDL_QueryTexture(texture, NULL, NULL, &texture_size.x, &texture_size.y);
-    SDL_Rect texture_rect = { x, y, texture_size.x, texture_size.y };
-    SDL_RenderCopyEx(r, texture, NULL, &texture_rect, angle, pivot, flipflags);
+    return tex;
+}
+
+void sdl_rendertexcropped(RenderTextureParameters param, SDL_Renderer* renderer) {
+    SDL_Surface* surface = load_image_to_surface(param.path_to_image);
+    SDL_Texture* texture = create_texture_from_surface(renderer, surface);
+    // x.xy = xy // y.xy = wh
+    SDL_Rect src_rect = { param.crop_rect.x.x, param.crop_rect.x.y, param.crop_rect.y.x, param.crop_rect.y.y };
+    SDL_Rect dest_rect = { param.position.x, param.position.y, param.crop_rect.y.x, param.crop_rect.y.y };
+    SDL_SetTextureColorMod(texture, param.modulate.x, param.modulate.y, param.modulate.z);
+    SDL_RenderCopyEx(renderer, texture, &src_rect, &dest_rect, param.angle, param.pivot, param.flipflags);
     SDL_DestroyTexture(texture);
-    return 0;
+}
+
+void _sdl_rendertexdefault(RenderTextureParameters param, SDL_Renderer* renderer) {
+    SDL_Surface* surface = load_image_to_surface(param.path_to_image);
+    SDL_Texture* texture = create_texture_from_surface(renderer, surface);
+    SDL_Rect texture_rect = { param.position.x, param.position.y, 0, 0 };
+    SDL_QueryTexture(texture, NULL, NULL, &texture_rect.w, &texture_rect.h);
+    SDL_SetTextureColorMod(texture, param.modulate.x, param.modulate.y, param.modulate.z);
+    SDL_RenderCopyEx(renderer, texture, NULL, &texture_rect, param.angle, param.pivot, param.flipflags);
+    SDL_DestroyTexture(texture);
+}
+
+// draw a texture at x, y
+void sdl_render_texture(RenderTextureParameters param, SDL_Renderer* renderer) {
+    if (param.crop_rect == Vector2T<Vector2T<int>>{ {0, 0}, { 0, 0 } }) // x.y , w.h
+    {
+        _sdl_rendertexdefault(param, renderer);
+    }
+    else {
+        sdl_rendertexcropped(param, renderer);
+    }
+}
+
+void sdl_draw_text(const char* text, Vector2T<int> pos, SDL_Renderer* r, SpriteSheetFont fontsheet = {}) {
+    RenderTextureParameters font_param{
+        fontsheet.path_to_sheet,
+        pos
+    };
+    font_param.modulate = fontsheet.font_color;
+    sdl_render_texture(font_param, r);
 }
 
 // defaults

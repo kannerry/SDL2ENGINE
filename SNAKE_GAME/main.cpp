@@ -18,15 +18,11 @@ const int default_player_length = 5;
 const int default_base_fps_cap = 12;
 
 void render_snake_chunk(int x, int y, SDL_Renderer* r) {
-	sdl_render_texture(
+	RenderTextureParameters _chunk {
 		"assets/snake_chunk.png",
-		x,
-		y,
-		r, 
-		0,
-		NULL,
-		SDL_FLIP_NONE
-	);
+		Vector2T<int> {x, y}
+	};
+	sdl_render_texture(_chunk, r);
 }
 
 void render(WindowContainer* window_container, SnakeGameState *gs) {
@@ -43,7 +39,11 @@ void render(WindowContainer* window_container, SnakeGameState *gs) {
 
 	// todo: multiple fruits
 	// fruit
-	sdl_render_texture("assets/apple.png", gs->fruit_pos.x * 8, gs->fruit_pos.y * 8, window_container->renderer);
+	RenderTextureParameters _apple{
+	"assets/apple.png",
+	Vector2T<int> {gs->fruit_pos.x * 8, gs->fruit_pos.y * 8}
+	};
+	sdl_render_texture(_apple, window_container->renderer);
 
 	// render head
 	render_snake_chunk(gs->player_head.x * 8, gs->player_head.y * 8, window_container->renderer);
@@ -72,15 +72,14 @@ void render(WindowContainer* window_container, SnakeGameState *gs) {
 			break;
 	}
 	// facing indicator for the char
-	sdl_render_texture(
+	RenderTextureParameters _fi{
 		"assets/facing_indicator.png",
-		gs->player_head.x * 8,
-		gs->player_head.y * 8,
-		window_container->renderer,
+		Vector2T<int> {gs->player_head.x * 8, gs->player_head.y * 8},
 		rot,
-		NULL,
 		flipdir
-	);
+		
+	};
+	sdl_render_texture(_fi, window_container->renderer);
 	//
 
 	sdl_default_render_present(window_container);
