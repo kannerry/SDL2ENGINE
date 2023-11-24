@@ -8,12 +8,14 @@
 #include "SDL2/SDL_image.h"
 #include "helper_main.h"
 
-struct WindowContainer {
+struct WindowContainer { // contains a window, renderer, and the state of said window/renderer pair
     SDL_Window* window{};
     SDL_Renderer* renderer{};
     bool alive = true;
 };
 
+// instantiate all the stuff needed for SDL rendering + some scaling if needed 
+// *don't want a 30x30 window, but still want 30x30 pixels to render? try 300x300 (30x30 at 10x scale)*
 int sdl_init(const char* title, int xpos, int ypos, int width, int height, WindowContainer* wc, int scale = 1) {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         return EXIT_FAILURE;
@@ -31,14 +33,16 @@ int sdl_init(const char* title, int xpos, int ypos, int width, int height, Windo
     return 0;
 }
 
-void sdl_cleanup(WindowContainer* wc) {
+void sdl_cleanup(WindowContainer* wc) { // destroy stuff and deinit sdl
     SDL_DestroyWindow(wc->window);
     SDL_DestroyRenderer(wc->renderer);
-    wc->alive = false;
     SDL_Quit();
+    wc->alive = false;
 }
 
-void sdl_get_logical_mouse_position(int* rX, int* rY, SDL_Renderer* r, SDL_Window* w) {
+// for scaling purposes: the mouse pos within the window doesn't match up to the renderer when
+// SDL_RenderSetLogicalSize() gets called
+void SDL_GetLogicalMouseState(int* rX, int* rY, SDL_Renderer* r, SDL_Window* w) {
     Vector2T<int> logical_size; Vector2T<int> window_size; Vector2T<int> mouse_position;
     SDL_RenderGetLogicalSize(r, &logical_size.x, &logical_size.y);
     SDL_GetWindowSize(w, &window_size.x, &window_size.y);
@@ -49,7 +53,8 @@ void sdl_get_logical_mouse_position(int* rX, int* rY, SDL_Renderer* r, SDL_Windo
     *rY = (mouse_position.y * logical_size.y) / window_size.y;
 }
 
-int sdl_render_texture(const char* path_to_image, int x, int y, SDL_Renderer* r) {
+// draw a texture at x, y
+int sdl_render_texture(const char* path_to_image, int x, int y, SDL_Renderer* r, double angle = 0, SDL_Point* pivot = NULL, SDL_RendererFlip flipflags = SDL_FLIP_NONE) {
     SDL_Surface* surface = IMG_Load(path_to_image);
     if (!surface) {
         std::cerr << "!surface:sdl_render_texture @ " << path_to_image << " (" << x << ", " << y << ")\n";
@@ -63,23 +68,26 @@ int sdl_render_texture(const char* path_to_image, int x, int y, SDL_Renderer* r)
     }
     Vector2T<int> texture_size;
     SDL_QueryTexture(texture, NULL, NULL, &texture_size.x, &texture_size.y);
-    SDL_Rect texture_rect = { x, y, x + texture_size.x, y + texture_size.y };
-    SDL_RenderCopy(r, texture, NULL, &texture_rect);
+    SDL_Rect texture_rect = { x, y, texture_size.x, texture_size.y };
+    SDL_RenderCopyEx(r, texture, NULL, &texture_rect, angle, pivot, flipflags);
     SDL_DestroyTexture(texture);
     return 0;
 }
 
+// defaults
 void sdl_default_process_event(SDL_Event* event, WindowContainer* wc) {
     if (event->type == SDL_QUIT) {
         sdl_cleanup(wc);
     }
 }
 
+// defaults
 void sdl_default_render_clear(WindowContainer* wc, SDL_Color clr) {
     SDL_SetRenderDrawColor(wc->renderer, clr.r, clr.g, clr.b, clr.a);
     SDL_RenderClear(wc->renderer);
 }
 
+// defaults
 void sdl_default_render_present(WindowContainer* wc) {
     SDL_RenderPresent(wc->renderer);
 }
