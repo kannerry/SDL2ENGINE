@@ -3,4 +3,8 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="powder_game.h" />
+    <ClInclude Include="..\SNAKE_GAME\misc.h" />
+  </ItemGroup>
 </Project>

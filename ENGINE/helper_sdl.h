@@ -20,7 +20,7 @@ struct RenderTextureParameters {
     double angle = 0;
     SDL_RendererFlip flipflags = SDL_FLIP_NONE;
     SDL_Point* pivot = NULL;
-    Vector3T<Uint8> modulate = { 0, 0, 0 };
+    Vector3T<Uint8> modulate = { 255, 255, 255 };
     Vector2T<Vector2T<int>> crop_rect{ {0, 0}, {0, 0} };
 };
 
@@ -135,31 +135,27 @@ void sdl_draw_text(const char* text, Vector2T<int> pos, SDL_Renderer* r, SpriteS
         int offset_LC = ch - 'a';
         int offset_NUM = ch - '0';
         int offset_SYM = ch - '!';
+        font_param.crop_rect = { {0, 0}, fontsheet.character_size };
         if (offset_UC >= 0 && offset_UC < 25) {
-            font_param.crop_rect = { {0, 0}, fontsheet.character_size };
             font_param.position.x += pathx;
             font_param.crop_rect.x.x = (offset_UC * 8);
         }
         else if (offset_LC >= 0 && offset_LC < 25) {
-            font_param.crop_rect = { {0, 0}, fontsheet.character_size };
             font_param.position.x += pathx;
             font_param.crop_rect.x.x = (offset_LC * 8) + 26*8;
         }
-        else if (ch == ' ') {
-            font_param.position.x += 8;
-        }
         else if (offset_NUM >= 0 && offset_NUM <= 9){
-            std::cout << ch << "\n";
-            font_param.crop_rect = { {0, 0}, fontsheet.character_size };
             font_param.position.x += pathx;
             font_param.crop_rect.x.x = (offset_NUM * 8);
             font_param.crop_rect.x.y = pathy * 1;
         }
         else if (offset_SYM >= 0 && offset_SYM <= 14) {
-            font_param.crop_rect = { {0, 0}, fontsheet.character_size };
             font_param.position.x += pathx;
             font_param.crop_rect.x.x = (offset_SYM * 8) + 10*8;
             font_param.crop_rect.x.y = pathy * 1;
+        }
+        else if (ch == ' ') {
+            font_param.position.x += 8;
         }
         if (ch != ' ') {
             sdl_render_texture(font_param, r);
