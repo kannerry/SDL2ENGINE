@@ -19,13 +19,19 @@ void process_event(SDL_Event* event, WindowContainer* window_container) {
 
 void render(WindowContainer* window_container, SpriteSheetFont font, bool debug) {
 	if (debug) {
+		int w; int h;
+		SDL_RenderGetLogicalSize(window_container->renderer, &w, &h);
 		font.font_color = Vector3T<Uint8>{ 0, 255, 0 };
 		Vector2T<int> mouse_position;
 		SDL_GetLogicalMouseState(&mouse_position.x, &mouse_position.y, window_container);
-		std::string rp = "(" + std::to_string(mouse_position.x) + ", " + std::to_string(mouse_position.y) + ")";
-		sdl_draw_text(rp.c_str(), mouse_position + Vector2T<int>(15, 15), window_container->renderer, font);
+		std::string rp = "[" + std::to_string(mouse_position.x) + ", " + std::to_string(mouse_position.y) + "]";
+		bool past_L = mouse_position.x >= w / 1.5;
+		bool past_B = mouse_position.y >= h / 1.25;
+		sdl_draw_text(rp.c_str(), mouse_position + Vector2T<int>(past_L ? -80 : 5, past_B ? -15 : 15), window_container->renderer, font);
+		std::string ws = std::to_string(w); std::string hs = std::to_string(h);
+		sdl_draw_text((ws+"x"+hs).c_str(), Vector2T<int>(5, 5 + 12), window_container->renderer, font);
 	}
-	sdl_draw_text(debug ? "POWDER GAME (debug)" : "POWDER GAME", Vector2T<int>(5, 5), window_container->renderer, font);
+	sdl_draw_text(debug ? "(debug)" : "POWDER GAME", Vector2T<int>(5, 5), window_container->renderer, font);
 	sdl_default_render_present(window_container);
 
 	sdl_default_render_clear(window_container, SDL_Color{ 16,16,16,SDL_ALPHA_OPAQUE });

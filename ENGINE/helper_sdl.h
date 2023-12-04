@@ -8,16 +8,20 @@
 #include "SDL2/SDL_image.h"
 #include "helper_main.h"
 
-struct WindowContainer { // contains a window, renderer, and the state of said window/renderer pair
+// Contains an SDL window & renderer,
+// as well as an "alive" state.
+struct WindowContainer {
     SDL_Window* window{};
     SDL_Renderer* renderer{};
     bool alive = true;
 };
 
+// Contains data for the sdl_render_texture() function
+// to render some texture from a path, at x,y.
 struct RenderTextureParameters {
     const char* path_to_image;
     Vector2T<int> position;
-    double angle = 0;
+    double angle = 0; /// TODO: make it look better
     SDL_RendererFlip flipflags = SDL_FLIP_NONE;
     SDL_Point* pivot = NULL;
     Vector3T<Uint8> modulate = { 255, 255, 255 };
@@ -109,7 +113,8 @@ void __sdl_rt(RenderTextureParameters param, SDL_Renderer* renderer) {
     SDL_DestroyTexture(texture);
 }
 
-// draw a texture at x, y
+// By default, this function will attempt to draw a texture
+// to the screen at x, y; from 0, 0.
 void sdl_render_texture(RenderTextureParameters param, SDL_Renderer* renderer) {
     if (param.crop_rect == Vector2T<Vector2T<int>>{ {0, 0}, { 0, 0 } }) // x.y , w.h
     {
@@ -120,6 +125,9 @@ void sdl_render_texture(RenderTextureParameters param, SDL_Renderer* renderer) {
     }
 }
 
+// This will attempt to draw to the screen
+// some text at a position, using the default
+// font; see ENGINE/assets/defaultfont.png
 void sdl_draw_text(const char* text, Vector2T<int> pos, SDL_Renderer* r, SpriteSheetFont fontsheet = {}) {
     RenderTextureParameters font_param{
         fontsheet.path_to_sheet,
@@ -179,20 +187,18 @@ void sdl_draw_text(const char* text, Vector2T<int> pos, SDL_Renderer* r, SpriteS
     }
 }
 
-// defaults
+// Generally, these are default handlers for the
+// SDL pipeline, e.g: process_event will handle 
+// cleanup on an event->type == SDL_QUIT.
 void sdl_default_process_event(SDL_Event* event, WindowContainer* wc) {
     if (event->type == SDL_QUIT) {
         sdl_cleanup(wc);
     }
 }
-
-// defaults
 void sdl_default_render_clear(WindowContainer* wc, SDL_Color clr) {
     SDL_SetRenderDrawColor(wc->renderer, clr.r, clr.g, clr.b, clr.a);
     SDL_RenderClear(wc->renderer);
 }
-
-// defaults
 void sdl_default_render_present(WindowContainer* wc) {
     SDL_RenderPresent(wc->renderer);
 }

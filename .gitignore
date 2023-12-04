@@ -396,3 +396,6 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# Hot Reload TEMP folder
+enc_temp_folder/*
