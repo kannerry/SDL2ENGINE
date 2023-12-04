@@ -123,7 +123,7 @@ void sdl_render_texture(RenderTextureParameters param, SDL_Renderer* renderer) {
 void sdl_draw_text(const char* text, Vector2T<int> pos, SDL_Renderer* r, SpriteSheetFont fontsheet = {}) {
     RenderTextureParameters font_param{
         fontsheet.path_to_sheet,
-        pos - Vector2T<int>(8, 0)
+        pos - Vector2T<int>(fontsheet.character_size.x, 0)
     };
     font_param.modulate = fontsheet.font_color;
     int i = 0;
@@ -134,24 +134,39 @@ void sdl_draw_text(const char* text, Vector2T<int> pos, SDL_Renderer* r, SpriteS
         int offset_UC = ch - 'A';
         int offset_LC = ch - 'a';
         int offset_NUM = ch - '0';
-        int offset_SYM = ch - '!';
+        int offset_SYM = ch - '!'; int offset_SYM2 = ch - ':'; int offset_SYM3 = ch - '['; int offset_SYM4 = ch - '{';
         font_param.crop_rect = { {0, 0}, fontsheet.character_size };
         if (offset_UC >= 0 && offset_UC < 25) {
             font_param.position.x += pathx;
-            font_param.crop_rect.x.x = (offset_UC * 8);
+            font_param.crop_rect.x.x = (offset_UC * pathx);
         }
         else if (offset_LC >= 0 && offset_LC < 25) {
             font_param.position.x += pathx;
-            font_param.crop_rect.x.x = (offset_LC * 8) + 26*8;
+            font_param.crop_rect.x.x = (offset_LC * pathx) + 26 * pathx;
         }
         else if (offset_NUM >= 0 && offset_NUM <= 9){
             font_param.position.x += pathx;
-            font_param.crop_rect.x.x = (offset_NUM * 8);
+            font_param.crop_rect.x.x = (offset_NUM * pathx);
             font_param.crop_rect.x.y = pathy * 1;
         }
         else if (offset_SYM >= 0 && offset_SYM <= 14) {
             font_param.position.x += pathx;
-            font_param.crop_rect.x.x = (offset_SYM * 8) + 10*8;
+            font_param.crop_rect.x.x = (offset_SYM * pathx) + 10 * pathx;
+            font_param.crop_rect.x.y = pathy * 1;
+        }
+        else if (offset_SYM2 >= 0 && offset_SYM2 <= 6) {
+            font_param.position.x += pathx;
+            font_param.crop_rect.x.x = (offset_SYM2 * pathx) + 25 * pathx;
+            font_param.crop_rect.x.y = pathy * 1;
+        }
+        else if (offset_SYM3 >= 0 && offset_SYM3 <= 6) {
+            font_param.position.x += pathx;
+            font_param.crop_rect.x.x = (offset_SYM3 * pathx) + 32 * pathx;
+            font_param.crop_rect.x.y = pathy * 1;
+        }
+        else if (offset_SYM4 >= 0 && offset_SYM4 <= 4) {
+            font_param.position.x += pathx;
+            font_param.crop_rect.x.x = (offset_SYM4 * pathx) + 39 * pathx;
             font_param.crop_rect.x.y = pathy * 1;
         }
         else if (ch == ' ') {
