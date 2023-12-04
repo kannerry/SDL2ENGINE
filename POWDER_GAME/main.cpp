@@ -14,6 +14,9 @@ void debug_toggle(bool& dbg, SDL_Event* event) {
 }
 
 void set_point_to_type(PowderGameState* game, Vector2T<int> point, PowderType type) {
+	if (point.x < 0 || point.y < 0 || point.x > game->width || point.y > game->height) {
+		return;
+	}
 	switch (type)
 	{
 		case WATER:
@@ -29,9 +32,12 @@ void set_point_to_type(PowderGameState* game, Vector2T<int> point, PowderType ty
 void process_event(SDL_Event* event, WindowContainer* window_container, PowderGameState* game) {
 	sdl_default_process_event(event, window_container);
 	Vector2T<int> mouse_position;
+	Vector2T<int> ls;
 	SDL_GetLogicalMouseState(&mouse_position.x, &mouse_position.y, window_container);
+	SDL_RenderGetLogicalSize(window_container->renderer, &ls.x, &ls.y);
 	if (SDL_GetMouseState(nullptr, nullptr) & SDL_BUTTON_LMASK) {
 		for (const auto& point : get_points_from_radius(mouse_position, 3)) {
+			if (point.x == ls.x || point.y == ls.y) { return; };
 			set_point_to_type(game, point, game->selected_type);
 		}
 	}
@@ -52,10 +58,9 @@ void process_event(SDL_Event* event, WindowContainer* window_container, PowderGa
 void render_game(WindowContainer* window_container, bool debug, SpriteSheetFont font, PowderGameState* game) {
 	Vector2T<int> mouse_position;
 	SDL_GetLogicalMouseState(&mouse_position.x, &mouse_position.y, window_container);
-	int under_type = game->data[mouse_position.x][mouse_position.y].type;
 	if (debug)
 	{
-		sdl_draw_text_to_mouse(type_string(static_cast<PowderType>(under_type)).c_str(), Vector2T<int>(0, 0), window_container, font);
+		//sdl_draw_text_to_mouse(type_string(static_cast<PowderType>(under_type)).c_str(), Vector2T<int>(0, 0), window_container, font);
 	}
 	else {
 		sdl_draw_text_to_mouse(type_string(game->selected_type).c_str(), Vector2T<int>(8, 8), window_container, font);
@@ -104,9 +109,10 @@ void process_game(PowderGameState* game) {
 				else {
 					if (left && right) {
 						bool lor = random_bool();
-						int dir = lor ? 1 : -1;
+						int dir = lor ? -1 : 1;
 						game->data[iw][ih].type = BLANK;
 						set_point_to_type(game, Vector2T<int>(iw - dir, ih), WATER);
+						break;
 					}
 					else {
 						if (right) {
