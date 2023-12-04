@@ -5,28 +5,33 @@
 #define POWDER_GAMESTATE_H
 
 enum PowderType {
-	BLANK
+	BLANK,
+	SOLID,
+	WATER,
+	MAXTYPE
 };
+
+std::string type_string(PowderType type) {
+	switch (type) {
+		case BLANK: return "Blank";
+		case SOLID: return "Ground";
+		case WATER: return "Water";
+		case MAXTYPE: return "";
+		default: return "UNKNOWN";
+	}
+}
 
 struct PowderObject {
 	int type = BLANK;
 	SDL_Color col{ 255, 255, 255 };
 };
 
-struct PowderGridPoint {
-	Vector2T<int> position;
-	PowderObject data;
-};
-
-struct PowderGrid {
+struct PowderGameState {
 	int width;
 	int height;
-	std::vector<std::vector<PowderGridPoint>> grid;
-	PowderGrid(int w, int h) : width(w), height(h), grid(w, std::vector<PowderGridPoint>(h)) {}
-};
-
-struct PowderGameState {
-	PowderGrid pg;
+	std::vector<std::vector<PowderObject>> data;
+	PowderType selected_type = SOLID;
+	PowderGameState(int w, int h) : width(w), height(h), data(std::vector<std::vector<PowderObject>>(w, std::vector<PowderObject>(h))) {}
 };
 
 #endif // !POWDER_GAMESTATE_H

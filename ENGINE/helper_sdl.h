@@ -187,6 +187,30 @@ void sdl_draw_text(const char* text, Vector2T<int> pos, SDL_Renderer* r, SpriteS
     }
 }
 
+void sdl_draw_text_to_mouse(const char* text, Vector2T<int> offset, WindowContainer* wc, SpriteSheetFont fontsheet = {}) {
+    int w; int h; int mx; int my;
+    SDL_RenderGetLogicalSize(wc->renderer, &w, &h);
+    SDL_GetLogicalMouseState(&mx, &my, wc);
+    int offset_x = strlen(text) * fontsheet.character_size.x;
+    int offset_y = fontsheet.character_size.y;
+    mx += offset.x; my += offset.y;
+    int amtx = 0; int amty = 0;
+    if (mx >= w - offset_x) {
+        amtx = mx - w + offset_x;
+    }
+    if (my >= h - offset_y) {
+        amty = my - h + offset_y;
+    }
+    if (my < 0) {
+        my = 0;
+    }
+    if (mx < 0) {
+        mx = 0;
+    }
+    Vector2T<int> pos = Vector2T<int>(mx - amtx, my - amty);
+    sdl_draw_text(text, pos, wc->renderer, fontsheet);
+}
+
 // Generally, these are default handlers for the
 // SDL pipeline, e.g: process_event will handle 
 // cleanup on an event->type == SDL_QUIT.

@@ -26,6 +26,21 @@ struct Vector2T { // dynamically typed vector2, can be float, can be int, etc...
 
 };
 
+std::vector<Vector2T<int>> get_points_from_radius(const Vector2T<int>& center, int radius) {
+    std::vector<Vector2T<int>> pointsInRadius;
+    for (int x = center.x - radius; x <= center.x + radius; ++x) {
+        for (int y = center.y - radius; y <= center.y + radius; ++y) {
+            if (std::sqrt((x - center.x) * (x - center.x) + (y - center.y) * (y - center.y)) <= radius) {
+                Vector2T<int> point;
+                point.x = x;
+                point.y = y;
+                pointsInRadius.push_back(point);
+            }
+        }
+    }
+    return pointsInRadius;
+}
+
 template<typename T>
 struct Vector3T {
     T x, y, z;
