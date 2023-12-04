@@ -17,7 +17,7 @@ void process_event(SDL_Event* event, WindowContainer* window_container) {
 	sdl_default_process_event(event, window_container);
 }
 
-void render(WindowContainer* window_container, SpriteSheetFont font, bool debug) {
+void render_debug(WindowContainer* window_container, bool debug, SpriteSheetFont font) {
 	if (debug) {
 		int w; int h;
 		SDL_RenderGetLogicalSize(window_container->renderer, &w, &h);
@@ -29,24 +29,28 @@ void render(WindowContainer* window_container, SpriteSheetFont font, bool debug)
 		bool past_B = mouse_position.y >= h / 1.25;
 		sdl_draw_text(rp.c_str(), mouse_position + Vector2T<int>(past_L ? -80 : 5, past_B ? -15 : 15), window_container->renderer, font);
 		std::string ws = std::to_string(w); std::string hs = std::to_string(h);
-		sdl_draw_text((ws+"x"+hs).c_str(), Vector2T<int>(5, 5 + 12), window_container->renderer, font);
+		sdl_draw_text((ws + "x" + hs).c_str(), Vector2T<int>(5, 5 + 12), window_container->renderer, font);
 	}
 	sdl_draw_text(debug ? "(debug)" : "POWDER GAME", Vector2T<int>(5, 5), window_container->renderer, font);
-	sdl_default_render_present(window_container);
+}
 
+void render(WindowContainer* window_container, PowderGameState* game, bool debug, SpriteSheetFont font) {
 	sdl_default_render_clear(window_container, SDL_Color{ 16,16,16,SDL_ALPHA_OPAQUE });
+	render_debug(window_container, debug, font);
+	sdl_default_render_present(window_container);
 }
 
 int main(int argc, char* args[]) {
 	WindowContainer window_container{};
-	PowderGameState game{};
 	bool debug = false;
-	sdl_init("POWDER GAME", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 450, &window_container, 2);
+	int w = 800; int h = 450;
+	sdl_init("POWDER GAME", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, &window_container, 2);
+	PowderGameState game{ PowderGrid{w, h} };
 	SDL_Event event;
 	SpriteSheetFont ssf{};
 	while (window_container.alive) {
 		ssf.font_color = get_rgb_from_time(SDL_GetTicks64());
-		render(&window_container, ssf, debug);
+		render(&window_container, &game, debug, ssf);
 		while (SDL_PollEvent(&event)) {
 			process_event(&event, &window_container);
 			debug_toggle(debug, &event);
