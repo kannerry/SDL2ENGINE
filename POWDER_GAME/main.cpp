@@ -88,7 +88,7 @@ bool random_bool() {
 void process_game(PowderGameState* game) {
 	for (size_t iw = 0; iw < game->width; iw++)
 	{
-		for (size_t ih = 0; ih < game->height; ih++)
+		for (size_t ih = game->height - 1; ih >= 1; ih--)
 		{
 			if (game->data[iw][ih].type == WATER) {
 				bool down = false;
