@@ -12,6 +12,14 @@ struct Vector2T { // dynamically typed vector2, can be float, can be int, etc...
     Vector2T() : x(T()), y(T()) {}
     Vector2T(const T& _x, const T& _y) : x(_x), y(_y) {}
 
+    operator Vector2T<int>() const {
+        return Vector2T<int>(static_cast<int>(x), static_cast<int>(y));
+    }
+
+    operator Vector2T<float>() const {
+        return Vector2T<float>(static_cast<float>(x), static_cast<float>(y));
+    }
+
     Vector2T<T> operator+(const Vector2T<T>& other) const {
         return Vector2T<T>(x + other.x, y + other.y);
     }
@@ -46,5 +54,10 @@ struct Vector3T {
     }
 };
 
+Vector2T<float> DisAngFromPoint(Vector2T<float> origin, float distance, float angle) {
+    float x = distance * cos(angle);
+    float y = distance * sin(angle);
+    return origin + Vector2T<float>(x, y);
+}
 
 #endif // !MAIN_HELPER_H
