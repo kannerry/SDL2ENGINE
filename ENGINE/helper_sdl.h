@@ -13,6 +13,7 @@
 struct WindowContainer {
     SDL_Window* window{};
     SDL_Renderer* renderer{};
+    SDL_Event event{};
     bool alive = true;
 };
 
@@ -60,9 +61,9 @@ void sdl_cleanup(WindowContainer* wc) { // destroy stuff and deinit sdl
     wc->alive = false;
 }
 
-// for scaling purposes: the mouse pos within the window doesn't match up to the renderer when
-// SDL_RenderSetLogicalSize() gets called
-void SDL_GetLogicalMouseState(int* rX, int* rY, WindowContainer* wc) {
+// for scaling purposes; the mouse pos within the window doesn't match up to the renderer when
+// SDL_RenderSetLogicalSize() has been used.
+void SDL_GetLogicalMousePosition(int* rX, int* rY, WindowContainer* wc) {
     Vector2T<int> logical_size; Vector2T<int> window_size; Vector2T<int> mouse_position;
     SDL_RenderGetLogicalSize(wc->renderer, &logical_size.x, &logical_size.y);
     SDL_GetWindowSize(wc->window, &window_size.x, &window_size.y);
@@ -190,7 +191,7 @@ void sdl_draw_text(const char* text, Vector2T<int> pos, SDL_Renderer* r, SpriteS
 void sdl_draw_text_to_mouse(const char* text, Vector2T<int> offset, WindowContainer* wc, SpriteSheetFont fontsheet = {}) {
     int w; int h; int mx; int my;
     SDL_RenderGetLogicalSize(wc->renderer, &w, &h);
-    SDL_GetLogicalMouseState(&mx, &my, wc);
+    SDL_GetLogicalMousePosition(&mx, &my, wc);
     int offset_x = strlen(text) * fontsheet.character_size.x;
     int offset_y = fontsheet.character_size.y;
     mx += offset.x; my += offset.y;

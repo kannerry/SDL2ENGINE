@@ -13,11 +13,12 @@ vcpkg install sdl2-image
 
 ## General Stuff
 ```c++
-// Contains an SDL window & renderer,
+// Contains an SDL window, SDL renderer, SDL event, 
 // as well as an "alive" state.
 struct WindowContainer { 
     SDL_Window* window{};
     SDL_Renderer* renderer{};
+    SDL_Event event{};
     bool alive = true;
 }
 
