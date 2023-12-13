@@ -144,11 +144,11 @@ void sdl_draw_text(const char* text, Vector2T<int> pos, SDL_Renderer* r, SpriteS
         int offset_NUM = ch - '0';
         int offset_SYM = ch - '!'; int offset_SYM2 = ch - ':'; int offset_SYM3 = ch - '['; int offset_SYM4 = ch - '{';
         font_param.crop_rect = { {0, 0}, fontsheet.character_size };
-        if (offset_UC >= 0 && offset_UC < 25) {
+        if (offset_UC >= 0 && offset_UC < 26) {
             font_param.position.x += pathx;
             font_param.crop_rect.x.x = (offset_UC * pathx);
         }
-        else if (offset_LC >= 0 && offset_LC < 25) {
+        else if (offset_LC >= 0 && offset_LC < 26) {
             font_param.position.x += pathx;
             font_param.crop_rect.x.x = (offset_LC * pathx) + 26 * pathx;
         }
